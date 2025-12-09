@@ -1059,15 +1059,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   queryData:
-    ID: 
-    Name: Monitor Curvo
-    Price: 
-    Stock: 
+    IDHeroe: 
+    Name: Destello Solar
+    Bando: 
+    Clase1: 
+    Clase2: 
+    Descripcion: 
   resultData:
-    ID: 
+    IDHeroe: 
     Name: 
-    Price: 
-    Stock: 
+    Bando: 
+    Clase1: 
+    Clase2: 
+    Descripcion: 
   hello: 0
 --- !u!1 &1728283832
 GameObject:

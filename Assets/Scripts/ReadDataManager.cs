@@ -6,11 +6,12 @@ using UnityEngine.Networking;
 public class ReadDataManager : MonoBehaviour
 {
     private readonly string SERVER_URL = "localhost:80/TF/";
+
     private readonly string READDATA_URL = "Utils/ReadData.php";
     private readonly string INSERTDATA_URL = "Utils/InsertData.php";
 
-    public ProductsDB queryData;
-    public ProductsDB resultData;
+    public Heroes queryData;
+    public Heroes resultData;
 
     public bool hello;
 
@@ -47,11 +48,11 @@ public class ReadDataManager : MonoBehaviour
         Debug.Log(request.downloadHandler.text);
 
         string jsonResult = request.downloadHandler.text;
-        ProductsResponse resultDataResponse = JsonUtility.FromJson<ProductsResponse>(jsonResult);
+        HeroesResponse resultDataResponse = JsonUtility.FromJson<HeroesResponse>(jsonResult);
         
-        if (resultDataResponse.products.Length > 0)
+        if (resultDataResponse.Hero.Length > 0)
         {
-            resultData = resultDataResponse.products[0];
+            resultData = resultDataResponse.Hero[0];
         }
     }
 
@@ -78,22 +79,27 @@ public class ReadDataManager : MonoBehaviour
         Debug.Log(request.downloadHandler.text);
 
         string jsonResult = request.downloadHandler.text;
-        ProductsResponse resultDataResponse = JsonUtility.FromJson<ProductsResponse>(jsonResult);
+
+        Debug.Log("JSON RECIBIDO: " + jsonResult);
+        HeroesResponse resultDataResponse = JsonUtility.FromJson<HeroesResponse>(jsonResult);
     }
 }
 
 [System.Serializable]
-public class ProductsDB
+public class Heroes
 {
-    public string ID;
+    public string IDHeroe;
     public string Name;
-    public string Price;
-    public string Stock;
+    public string Bando;
+    public string Clase1;
+    public string Clase2;
+    public string Descripcion;
 }
 
-public class ProductsResponse
+
+public class HeroesResponse
 {
     public bool success;
     public string message;
-    public ProductsDB[] products;
+    public Heroes[] Hero;
 }
