@@ -20,6 +20,9 @@ public class ReadDataManager : MonoBehaviour
     public Sobres querySobres;
     public Sobres resultSobres;
 
+    public Usuarios queryUsuarios;
+    public Usuarios resultUsuarios;
+
 
     public bool hello;
 
@@ -109,6 +112,33 @@ public class ReadDataManager : MonoBehaviour
         if (result.Sobre.Length > 0)
             resultSobres = result.Sobre[0];
     }
+    public void ReadUsuario()
+    {
+        StartCoroutine(ReadUsuarioConnection());
+    }
+
+    private IEnumerator ReadUsuarioConnection()
+    {
+        string url = $"{SERVER_URL}/{READDATA_URL}";
+
+        string jsonData = JsonUtility.ToJson(queryUsuarios);
+        byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
+
+
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.uploadHandler = new UploadHandlerRaw(jsonToSend);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        Debug.Log("USUARIO RESPONSE" + request.downloadHandler.text);
+
+        UsuariosResponse result = JsonUtility.FromJson<UsuariosResponse>(request.downloadHandler.text);
+
+        if (result.Usuario.Length > 0)
+            resultUsuarios = result.Usuario[0];
+    }
 
     private IEnumerator InsertDataConnection()
     {
@@ -196,6 +226,26 @@ public class SobresResponse
     public bool success;
     public string message;
     public Sobres[] Sobre;
+}
+
+[System.Serializable]
+public class Usuarios
+{
+    public string IDUsuario;
+    public string Name;
+    public string Correo;
+    public string Pais;
+    public string Gemas;
+    public string RangoActual;
+    public string LigaActual;
+    public string Activo;
+}
+
+public class UsuariosResponse
+{
+    public bool success;
+    public string message;
+    public Usuarios[] Usuario;
 }
 
 
