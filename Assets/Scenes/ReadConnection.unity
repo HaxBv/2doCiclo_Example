@@ -966,7 +966,31 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1338022779}
         m_TargetAssemblyTypeName: ReadDataManager, Assembly-CSharp
-        m_MethodName: ReadDataMethod
+        m_MethodName: ReadCarta
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1338022779}
+        m_TargetAssemblyTypeName: ReadDataManager, Assembly-CSharp
+        m_MethodName: ReadHero
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1338022779}
+        m_TargetAssemblyTypeName: ReadDataManager, Assembly-CSharp
+        m_MethodName: ReadSobre
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1071,6 +1095,42 @@ MonoBehaviour:
     Bando: 
     Clase1: 
     Clase2: 
+    Descripcion: 
+  queryCartas:
+    IDCarta: 
+    Name: Nuez
+    Bando: 
+    Clase: 
+    TipoCarta: 
+    Coleccion: 
+    Rareza: 
+    Coste: 
+    Fuerza: 
+    Vida: 
+    Habilidad: 
+  resultCartas:
+    IDCarta: 
+    Name: 
+    Bando: 
+    Clase: 
+    TipoCarta: 
+    Coleccion: 
+    Rareza: 
+    Coste: 
+    Fuerza: 
+    Vida: 
+    Habilidad: 
+  querySobres:
+    IDSobre: 
+    Name: 
+    PrecioGemas: 
+    PrecioSoles: 
+    Descripcion: 
+  resultSobres:
+    IDSobre: 
+    Name: 
+    PrecioGemas: 
+    PrecioSoles: 
     Descripcion: 
   hello: 0
 --- !u!1 &1728283832

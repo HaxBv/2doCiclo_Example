@@ -13,47 +13,101 @@ public class ReadDataManager : MonoBehaviour
     public Heroes queryData;
     public Heroes resultData;
 
+    public Cartas queryCartas;
+    public Cartas resultCartas;
+
+
+    public Sobres querySobres;
+    public Sobres resultSobres;
+
+
     public bool hello;
 
-    public void ReadDataMethod()
+    public void ReadHero()
     {
-        StartCoroutine(ReadDataConnection());
+        StartCoroutine(ReadHeroConnection());
     }
 
+    
     public void InsertDataMethod()
     {
         StartCoroutine(InsertDataConnection());
     }
 
-    private IEnumerator ReadDataConnection()
+    private IEnumerator ReadHeroConnection()
     {
-        string CONNECT_USER_PHP = $"{SERVER_URL}/{READDATA_URL}";
+        string url = $"{SERVER_URL}/{READDATA_URL}";
 
-        string jsonData = JsonUtility.ToJson(queryData);
+        string jsonData = JsonUtility.ToJson(queryData); 
         byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
 
-        UnityWebRequest request = new UnityWebRequest(CONNECT_USER_PHP, "POST");
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
         request.uploadHandler = new UploadHandlerRaw(jsonToSend);
         request.downloadHandler = new DownloadHandlerBuffer();
         request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.ConnectionError ||
-                request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            Debug.LogError("Error de Red (Unity): " + request.error);
-        }
+        Debug.Log("HERO RESPONSE" + request.downloadHandler.text);
 
-        Debug.Log(request.downloadHandler.text);
+        HeroesResponse result = JsonUtility.FromJson<HeroesResponse>(request.downloadHandler.text);
 
-        string jsonResult = request.downloadHandler.text;
-        HeroesResponse resultDataResponse = JsonUtility.FromJson<HeroesResponse>(jsonResult);
-        
-        if (resultDataResponse.Hero.Length > 0)
-        {
-            resultData = resultDataResponse.Hero[0];
-        }
+        if (result.Hero.Length > 0)
+            resultData = result.Hero[0];
+    }
+    public void ReadCarta()
+    {
+        StartCoroutine(ReadCartaConnection());
+    }
+
+    private IEnumerator ReadCartaConnection()
+    {
+        string url = $"{SERVER_URL}/{READDATA_URL}";
+
+        string jsonData = JsonUtility.ToJson(queryCartas); 
+        byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
+
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.uploadHandler = new UploadHandlerRaw(jsonToSend);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        Debug.Log("CARTA RESPONSE" + request.downloadHandler.text);
+
+        CartasResponse result = JsonUtility.FromJson<CartasResponse>(request.downloadHandler.text);
+
+        if (result.Carta.Length > 0)
+            resultCartas = result.Carta[0];
+    }
+
+    public void ReadSobre()
+    {
+        StartCoroutine(ReadSobreConnection());
+    }
+
+    private IEnumerator ReadSobreConnection()
+    {
+        string url = $"{SERVER_URL}/{READDATA_URL}";
+
+        string jsonData = JsonUtility.ToJson(querySobres);
+        byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonData);
+
+
+        UnityWebRequest request = new UnityWebRequest(url, "POST");
+        request.uploadHandler = new UploadHandlerRaw(jsonToSend);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        Debug.Log("SOBRE RESPONSE" + request.downloadHandler.text);
+
+        SobresResponse result = JsonUtility.FromJson<SobresResponse>(request.downloadHandler.text);
+
+        if (result.Sobre.Length > 0)
+            resultSobres = result.Sobre[0];
     }
 
     private IEnumerator InsertDataConnection()
@@ -103,3 +157,46 @@ public class HeroesResponse
     public string message;
     public Heroes[] Hero;
 }
+
+[System.Serializable]
+public class Cartas
+{
+    public string IDCarta;
+    public string Name;
+    public string Bando;
+    public string Clase;
+    public string TipoCarta;
+    public string Coleccion;
+    public string Rareza;
+    public string Coste;
+    public string Fuerza;
+    public string Vida;
+    public string Habilidad;
+}
+
+public class CartasResponse
+{
+    public bool success;
+    public string message;
+    public Cartas[] Carta;
+}
+
+[System.Serializable]
+public class Sobres
+{
+    public string IDSobre;
+    public string Name;
+    public string PrecioGemas;
+    public string PrecioSoles;
+    public string Descripcion;
+}
+
+public class SobresResponse
+{
+    public bool success;
+    public string message;
+    public Sobres[] Sobre;
+}
+
+
+
