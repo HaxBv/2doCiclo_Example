@@ -1,85 +1,160 @@
 <?php
-    header('Content-Type: application/json');
+header('Content-Type: application/json');
 
-    // Credenciales
-    define('DB_SERVER', 'localhost');
-    define('DB_USERNAME', 'root');
-    define('DB_PASSWORD', '');
-    define('DB_DATAbasE', 'tf_example');
+// Credenciales
+define('DB_SERVER', 'localhost');
+define('DB_USERNAME', 'root');
+define('DB_PASSWORD', '');
+define('DB_DATABASE', 'pvz_héroes');
 
-    // Inicializamos el objeto final de respuesta ProductsResponse
-    $response = [
-        "success" => false,
-        "message" => "Ocurrió un error desconocido.",
-        "products" => []
-    ];
+// Respuesta inicial
+$response = [
+    "success" => false,
+    "message" => "Ocurrió un error desconocido.",
+    "Hero" => [],
+    "Carta" => [],
+    "Sobre" => []
+];
 
-    $data = json_decode(file_get_contents("php://input"), true);
+// Leer JSON desde Unity
+$data = json_decode(file_get_contents("php://input"), true);
 
-    $nombre_a_buscar = $data['Name'];
-    //$nombre_a_buscar = 'Monitor Curvo';
+// Recoger el campo Name de forma segura
+$nombre_Heroe_a_buscar = trim($data["Name"] ?? "");
+$nombre_Carta_a_buscar = trim($data["Name"] ?? "");
+$nombre_Sobre_a_buscar = trim($data["Name"] ?? "");
 
-    
 
-    // Create connection
-    $conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATAbasE);
+// Conexión
+$conn = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_DATABASE);
 
-    // Verificar la conexión
-    if ($conn->connect_error) {
-        $response["message"] = "Error de conexión a la BD: " . $conn->connect_error;
-    
-        // Devolvemos la respuesta de error y terminamos la ejecución
-        header('Content-Type: application/json');
-        die(json_encode($response));
-    }
+if ($conn->connect_error) {
+    $response["message"] = "Error de conexión a la BD: " . $conn->connect_error;
+    echo json_encode($response);
+    exit();
+}
 
-    // 4. Preparar la consulta SQL (SELECT * FROM products WHERE nombre = ?)
-    $sql = "SELECT id, nombre, precio, stock FROM products WHERE nombre = ?";
+//////////////////////////////////////////////////
+//             CONSULTA HÉROES
+//////////////////////////////////////////////////
 
-    // Usar Prepared Statements para seguridad
+if ($nombre_Heroe_a_buscar !== "") {
+
+    $sql = "SELECT ID_Héroe, Nombre, ID_Bando, ID_Clase1, ID_Clase2, Descripción 
+            FROM héroes 
+            WHERE Nombre = ?";
+
     $stmt = $conn->prepare($sql);
 
-    // Verificar si la preparación falló
-    if ($stmt === false) {
-        $response["message"] = "Error al preparar la consulta: " . $conn->error;
-    } else {
-        // 5. Asignar parámetros y ejecutar
-        $stmt->bind_param("s", $nombre_a_buscar);
+    if ($stmt !== false) {
+
+        $stmt->bind_param("s", $nombre_Heroe_a_buscar);
         $stmt->execute();
         $result = $stmt->get_result();
-        
-        // 6. Procesar resultados
-        if ($result->num_rows > 0) {
-            // Se encontró el producto (solo uno, gracias a UNIQUE)
-            $row = $result->fetch_assoc();
-            
-            // Mapear al formato ProductsDB (todo como string)
-            $product_db = [
-                "ID"    => (string) $row['id'],
-                "Name"  => (string) $row['nombre'],
-                "Price" => (string) $row['precio'],
-                "Stock" => (string) $row['stock']
+
+        if ($row = $result->fetch_assoc()) {
+            $response["Hero"][] = [
+                "IDHeroe"     => (string) $row['ID_Héroe'],
+                "Name"        => (string) $row['Nombre'],
+                "Bando"       => (string) $row['ID_Bando'],
+                "Clase1"      => (string) $row['ID_Clase1'],
+                "Clase2"      => (string) $row['ID_Clase2'],
+                "Descripcion" => (string) $row['Descripción']
             ];
-            
-            // Llenar el objeto de respuesta ProductsResponse
-            $response["success"] = true;
-            $response["message"] = "Producto encontrado con éxito.";
-            $response["products"][] = $product_db; // Lo agregamos al array 'products'
-            
-        } else {
-            // No se encontró el producto
-            $response["success"] = true; // La consulta se ejecutó correctamente (no hubo error de BD)
-            $response["message"] = "Producto no encontrado: " . $nombre_a_buscar;
         }
 
-        // 7. Cerrar statement
         $stmt->close();
     }
+}
 
-    // 8. Cerrar conexión a la BD
-    $conn->close();
+//////////////////////////////////////////////////
+//             CONSULTA CARTAS
+//////////////////////////////////////////////////
 
-    // 9. Configurar cabecera y devolver el JSON final
-    header('Content-Type: application/json');
-    echo json_encode($response);
+if ($nombre_Carta_a_buscar !== "") {
+
+    $sql = "SELECT ID_Carta, Nombre, ID_Bando, ID_Clase, Tipo_Carta, ID_Coleccion, Rareza, Coste, Fuerza, Vida, Habilidad 
+            FROM cartas 
+            WHERE Nombre = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt !== false) {
+
+        $stmt->bind_param("s", $nombre_Carta_a_buscar);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $response["Carta"][] = [
+                "IDCarta"    => (string) $row['ID_Carta'],
+                "Name"       => (string) $row['Nombre'],
+                "Bando"      => (string) $row['ID_Bando'],
+                "Clase"      => (string) $row['ID_Clase'],
+                "TipoCarta"  => (string) $row['Tipo_Carta'],
+                "Coleccion"  => (string) $row['ID_Coleccion'],
+                "Rareza"     => (string) $row['Rareza'],
+                "Coste"      => (string) $row['Coste'],
+                "Fuerza"     => (string) $row['Fuerza'],
+                "Vida"       => (string) $row['Vida'],
+                "Habilidad"  => (string) $row['Habilidad']
+            ];
+        }
+
+        $stmt->close();
+    }
+}
+//////////////////////////////////////////////////
+//             CONSULTA SOBRES
+//////////////////////////////////////////////////
+
+if ($nombre_Sobre_a_buscar !== "") {
+
+    $sql = "SELECT ID_Sobre, Nombre, Precio_Gemas, Precio_Soles, Descripción
+            FROM sobres 
+            WHERE Nombre = ?";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt !== false) {
+
+        $stmt->bind_param("s", $nombre_Sobre_a_buscar);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($row = $result->fetch_assoc()) {
+            $response["Sobre"][] = [
+                "IDSobre"    => (string) $row['ID_Sobre'],
+                "Name"       => (string) $row['Nombre'],
+                "PrecioGemas"      => (string) $row['Precio_Gemas'],
+                "PrecioSoles"      => (string) $row['Precio_Soles'],
+                "Descripcion"  => (string) $row['Descripción'],
+            ];
+        }
+
+        $stmt->close();
+    }
+}
+
+
+
+//////////////////////////////////////////////////
+//        MENSAJE FINAL SEGÚN RESULTADOS
+//////////////////////////////////////////////////
+
+if (!empty($response["Hero"]) || !empty($response["Carta"]) || !empty($response["Sobre"])) {
+    $response["success"] = true;
+    $response["message"] = "Datos encontrados.";
+} else {
+    $response["success"] = true;
+    $response["message"] = "No se encontraron resultados para: " . $nombre_Heroe_a_buscar;
+}
+
+
+// Cerrar conexión
+$conn->close();
+
+// Enviar respuesta
+echo json_encode($response);
+
 ?>
